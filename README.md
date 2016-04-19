@@ -1,6 +1,7 @@
 # cLoop
+:a
 
-cLoop is a closed loop **EEG-tDCS stimulator**.
+cLoop is an awesome  closed loop **EEG-tDCS stimulator**.
 
 ## Modules
 
