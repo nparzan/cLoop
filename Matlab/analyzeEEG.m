@@ -1,6 +1,6 @@
 function [ Delta,Theta,Alpha,Beta,Gamma ] = analyzeEEG( eeg_signal )
 % This function get a raw eeg signal from a single channel 
-% use FFT to break it into to frequencies and return the mean amplitude
+% use FFT to break it into to frequencies and return the MAX AMPLITUDE
 % for each of the wave types
 
 fs = 500; % StarSim Sampling Frequency is 500Hz
@@ -36,7 +36,7 @@ Frequencies = f(IX(1+end-numel(Amplitudes):end)); %frequency of the peaks
 % Alpha (8-12Hz)
 % Beta (12-40Hz)
 % Gamma (38-42Hz)
-% Everything else will be countde as noise
+% Everything else will be counted as noise
 
 Delta = [0];Theta = [0];Alpha = [0];Beta = [0];Gamma = [0];
 
@@ -56,6 +56,7 @@ for i = 1:length(Amplitudes)
         Gamma = [Gamma Amplitudes(i)];
     end 
 end
+
 % Calculating the max Amplitude for each wave type
 
 Delta = max(Delta);
