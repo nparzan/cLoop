@@ -24,17 +24,18 @@ Frequencies = f(IX(1+end-numel(Amplitudes):end)); %frequency of the peaks
 
 % Plot single-sided amplitude spectrum.
 
-plot(f,2*abs(Y(1:NFFT/2+1)));
-axis([0 max(Frequencies) 0 max(Amplitudes)]);
-title('Single-Sided Amplitude Spectrum of y(t)');
-xlabel('Frequency (Hz)');
-ylabel('Amplitude - |Y(f)|');
+%plot(f,2*abs(Y(1:NFFT/2+1)));
+%axis([0 max(Frequencies) 0 max(Amplitudes)]);
+%title('Single-Sided Amplitude Spectrum of y(t)');
+%xlabel('Frequency (Hz)');
+%ylabel('Amplitude - |Y(f)|');
 
 % Seperate into EEG wave types
 % Delta (0.5-4Hz)
 % Theta (4-8Hz)
 % Alpha (8-12Hz)
 % Beta (12-40Hz)
+% Gamma (38-42Hz)
 % Everything else will be countde as noise
 
 Delta = [0];Theta = [0];Alpha = [0];Beta = [0];Gamma = [0];
@@ -55,14 +56,12 @@ for i = 1:length(Amplitudes)
         Gamma = [Gamma Amplitudes(i)];
     end 
 end
-
-% Calculating the mean Amplitude for each wave type
+% Calculating the max Amplitude for each wave type
 
 Delta = max(Delta);
 Theta = max(Theta);
 Alpha = max(Alpha);
 Beta = max(Beta);
 Gamma = max(Gamma);
-
 end
 

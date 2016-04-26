@@ -54,7 +54,9 @@
 %
 % Known issues: None
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [ret] = ClosedLoopTest (templateName)
+function [ret, theta, delta] = ClosedLoopTest (templateName)
+
+addpath('./MatNIC');
 
 ret = 0;
 
@@ -87,7 +89,9 @@ disp('INFO: Load template successful!')
 % Launch stimulation section
 isStimulating = false;
 initTime = clock;
+
 while (1)
+    
     [ret, status] = MatNICQueryStatus(sock);    
     if (ret < 0)
         return
@@ -112,9 +116,16 @@ while (1)
             end
     end
 end
-
-while (isStimulating)
-    EEG = getEEG(10,3,host);
+n = 0;
+theta = zeros(10,1);
+delta = zeros(10,1);
+while (isStimulating && (n < 10))
+    n = n+1
+    EEG = getEEG(10,8,host);
+    theta(n) = EEG.Activities(4,3);
+    if (n > 1)
+        delta(n) = theta(n) - theta(n-1)
+    end
     Stm = getStimulation(EEG);
     [ret, status] = MatNICQueryStatus(sock);    
     if (ret < 0)
@@ -127,10 +138,15 @@ while (isStimulating)
         case 'CODE_STATUS_STIMULATION_FULL'
             
             disp(sprintf('* Stimulation started. Ellapsed %f sec', etime(clock, initTime) ))
-            if strcmp(Stm.Function,'MatNICOnlineAtdcsPeak')
-                ret = MatNICOnlineAtdcsPeak(Stm.amplitudeArray, Stm.channelArray, ...
-                                        Stm.transitionToPeak, Stm.transitionStay, ...
-                                        Stm.transitionFromPeak, sock)
+            if strcmp(Stm.Function,'MatNICOnlineAtacsPeak')
+                if(Stm.amplitudeArray > 0)
+                    ret = MatNICOnlineAtacsPeak(Stm.amplitudeArray, Stm.channelArray, ...
+                                            Stm.transitionToPeak, Stm.transitionStay, ...
+                                            Stm.transitionFromPeak, sock)                    
+                    %pause((Stm.transitionToPeak + Stm.transitionStay + Stm.transitionFromPeak)/1000);
+                    %disp('Stimulating finished...');
+                    %pause(5);
+                end
             end
             pause(3);
             %break;
