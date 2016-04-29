@@ -6,6 +6,8 @@ $dbname = "noamp1";
 $low = $_POST["LowID"];
 $high = $_POST["HighID"];
 
+//Line ending test
+
 // Create connection
 $conn = new mysqli($servername, $username, $password,$dbname);
 
