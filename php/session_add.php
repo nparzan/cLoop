@@ -39,7 +39,7 @@ $fields = "";
 $values = "";
 
 // Handle add session request
-if ($data["action"] == "ADD_SESSION"){
+if ($data["action"] == "SESSION_ADD"){
     $session_data = $data["data"];
 }
 
