@@ -1,6 +1,7 @@
 <?php
 header('Content-type: application/json');
 require_once("connect.php");
+require_once("log_event.php");
 require_once("../session_add.php");
 
 $ret = 0;
@@ -39,7 +40,20 @@ if ($call_conn["ret"] != 0){
 // Handle add session request
 if ($data["action"] == "SESSION_ADD"){
     $response = session_add($data["data"],$conn);
+    if ($response["ret"] == 0){
+        $log_ret = log_event($response["session_id"],$response,"SESSION_ADD","","PASS",$conn);
+    }
+    else{
+        $log_ret = log_event(1,$response,"SESSION_ADD","","FAIL",$conn);
+    }
+    $response["log_ret"] = $log_ret["ret"];
+    if ($log_ret["ret"] != 0){
+        $response["log_error"] = $log_ret["error"];    
+    }
     echo json_encode($response);
+
+    // Close the connection
+    $conn->close();
     exit($response["ret"]);
 }
 

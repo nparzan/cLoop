@@ -29,8 +29,6 @@ function session_add($data,$conn){
         $ret_arr["error"] = $err;
     }
 
-    // Close the connection, return output
-    $conn->close();
     return $ret_arr;
 }
 
