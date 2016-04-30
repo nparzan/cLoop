@@ -6,13 +6,16 @@ function log_event($session_id,$data,$event_type,$details,$passfail,$conn){
     $ret_arr["ret"] = 0;
     $sql = "";
     
+    if (is_array($details)){
+        $details = implode(", ",$details);
+    }
     // Construct entry
     if ($data["ret"] != 0){
-        $event_type = "ERROR_".$event_type;
-        $details = $data["error"]." $details";
-        // Remove bad chars from log entry details
-        $details = preg_replace('/[^a-zA-Z0-9_ %\[\]\.\(\)%&-]/s', '', $details);
+        $details = $data["error"]." $details";    
     }
+
+    // Remove bad chars from log entry details
+    $details = preg_replace('/[^a-zA-Z0-9_ %\,\[\]\.\(\)%&-]/s', '', $details);
     $sql = "INSERT INTO `cloop_log` (`session_id`, `type`,`details`,`status`) VALUES ($session_id, '$event_type', '$details','$passfail')";
 
     $err = "";

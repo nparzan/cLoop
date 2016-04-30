@@ -2,6 +2,7 @@
 header('Content-type: application/json');
 require_once("connect.php");
 require_once("log_event.php");
+require_once("sql_add_data_from_matlab.php");
 require_once("../session_add.php");
 
 $ret = 0;
@@ -37,24 +38,35 @@ if ($call_conn["ret"] != 0){
     exit($ret_arr["ret"]);
 }
 
-// Handle add session request
-if ($data["action"] == "SESSION_ADD"){
-    $response = session_add($data["data"],$conn);
+// Add data to sql server
+if ($data["action"] == "EEG_ACTIVITY_ADD" || $data["action"] == "SESSION_ADD" || $data["action"] == "STIMULATION_ADD"){
+    $response = sql_add_data_from_matlab($data["data"],$data["table"],$data["action"],$conn);
+    $session_id = $data["data"]["session_id"];
     if ($response["ret"] == 0){
-        $log_ret = log_event($response["session_id"],$response,"SESSION_ADD","","PASS",$conn);
+        $passfail = "PASS";
+        if ($data["action"] == "SESSION_ADD"){
+            $session_id = $response["session_id"];
+        }
     }
     else{
-        $log_ret = log_event(1,$response,"SESSION_ADD","","FAIL",$conn);
+        $passfail = "FAIL";
+        if ($data["action"] == "SESSION_ADD"){
+            $session_id = 1;
+        }
     }
+    $log_ret = log_event($session_id,$response,$data["action"],$data["data"],$passfail,$conn);
     $response["log_ret"] = $log_ret["ret"];
     if ($log_ret["ret"] != 0){
         $response["log_error"] = $log_ret["error"];    
     }
-    echo json_encode($response);
-
-    // Close the connection
-    $conn->close();
-    exit($response["ret"]);
 }
 
+echo json_encode($response);
+
+// Close the connection
+$conn->close();
+exit($response["ret"]);
+
 ?>
+
+

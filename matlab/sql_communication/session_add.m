@@ -1,14 +1,13 @@
 function [ret] = session_add(subject_id,experimenter_id,task,objective_activity_band,objective_activity_value,electrode_placement,comment)
-    addpath('jsonlab');
-    
-    ADD_SESSION_URL = 'http://www.cs.tau.ac.il/~noamp1/cLoop/php/session_add.php';
+    constant_load_all;
+    ADD_SESSION_URL = constant_address.INSERT_DATA_URL;
     [ret,session_data]=create_struct(subject_id,experimenter_id,task,objective_activity_band,objective_activity_value,electrode_placement,comment);
-    request.action = 'ADD_SESSION';
+    request.action = constant_activity.SESSION_ADD_ACTIVITY;
     request.data = session_data;
+    request.table = constant_table.SESSION;
     if ret ~= 0
         return;
     end
     options = weboptions('MediaType','application/json');
-    ret_raw = webwrite(ADD_SESSION_URL,request,options);
-    ret = loadjson(ret_raw);
+    ret = webwrite(ADD_SESSION_URL,request,options);
 end
