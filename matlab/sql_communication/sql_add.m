@@ -1,6 +1,6 @@
 function [ret] = sql_add(varargin)
     constant_load_all;
-    insert_data_to_sql_url = constant_address.INSERT_DATA_URL;
+    %insert_data_to_sql_url = ;
     activity = varargin{1};
     if strcmp(activity,constant_activity.SESSION_ADD_ACTIVITY)
         subject_id = varargin{2}; experimenter_id = varargin{3}; task = varargin{4};
@@ -17,10 +17,9 @@ function [ret] = sql_add(varargin)
         request.action = constant_activity.EEG_ACTIVITY_ADD_ACTIVITY;
         request.table = constant_table.EEG_ACTIVITY;
     elseif strcmp(activity,constant_activity.STIMULATION_ADD_ACTIVITY)
-        %session_id, stimulation_duration, stimulation_amplitude, stimulation_frequency
-        session_id = varargin{2}; stimulation_duration = varargin{3}; 
-        stimulation_amplitude = varargin{4}; stimulation_frequency = varargin{5};
-        [ret,data]=create_struct(session_id, stimulation_duration, stimulation_amplitude, stimulation_frequency);
+        session_id = varargin{2}; eeg_activity_id = varargin{3}; stimulation_duration = varargin{4}; 
+        stimulation_amplitude = varargin{5}; stimulation_frequency = varargin{6};
+        [ret,data]=create_struct(session_id, eeg_activity_id, stimulation_duration, stimulation_amplitude, stimulation_frequency);
         request.action = constant_activity.STIMULATION_ADD_ACTIVITY;
         request.table = constant_table.STIMULATION;
     end
@@ -29,5 +28,5 @@ function [ret] = sql_add(varargin)
     end
     request.data = data;
     options = weboptions('MediaType','application/json');
-    ret = webwrite(insert_data_to_sql_url,request,options);
+    ret = webwrite(constant_address.INSERT_DATA_URL,request,options);
 end

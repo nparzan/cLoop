@@ -3,6 +3,7 @@ header('Content-type: application/json');
 require_once("connect.php");
 require_once("log_event.php");
 require_once("sql_add_data_from_matlab.php");
+require_once("get_data_from_sql.php");
 require_once("../session_add.php");
 
 $ret = 0;
@@ -38,27 +39,35 @@ if ($call_conn["ret"] != 0){
     exit($ret_arr["ret"]);
 }
 
+$session_id = $data["data"]["session_id"];
+
 // Add data to sql server
 if ($data["action"] == "EEG_ACTIVITY_ADD" || $data["action"] == "SESSION_ADD" || $data["action"] == "STIMULATION_ADD"){
     $response = sql_add_data_from_matlab($data["data"],$data["table"],$data["action"],$conn);
-    $session_id = $data["data"]["session_id"];
-    if ($response["ret"] == 0){
-        $passfail = "PASS";
-        if ($data["action"] == "SESSION_ADD"){
-            $session_id = $response["session_id"];
-        }
+}
+
+if ($data["action"] == "EEG_ACTIVITY_AND_STIMULATION_GET"){
+    $response = get_eeg_activity_and_stimulation_from_sql($data,$conn);
+
+}
+
+if ($response["ret"] == 0){
+    $passfail = "PASS";
+    if ($data["action"] == "SESSION_ADD"){
+        $session_id = $response["session_id"];
     }
-    else{
-        $passfail = "FAIL";
-        if ($data["action"] == "SESSION_ADD"){
-            $session_id = 1;
-        }
+}
+else{
+    $passfail = "FAIL";
+    if ($data["action"] == "SESSION_ADD"){
+        $session_id = 1;
     }
-    $log_ret = log_event($session_id,$response,$data["action"],$data["data"],$passfail,$conn);
-    $response["log_ret"] = $log_ret["ret"];
-    if ($log_ret["ret"] != 0){
-        $response["log_error"] = $log_ret["error"];    
-    }
+}
+
+$log_ret = log_event($session_id,$response,$data["action"],$data["data"],$passfail,$conn);
+$response["log_ret"] = $log_ret["ret"];
+if ($log_ret["ret"] != 0){
+    $response["log_error"] = $log_ret["error"];    
 }
 
 echo json_encode($response);
@@ -68,5 +77,4 @@ $conn->close();
 exit($response["ret"]);
 
 ?>
-
 

@@ -2,11 +2,12 @@ import sys, json
 
 
 def f():
-    print ("XXX")
+    print ("XXXs")
 
 # Load the data that PHP sent us
 try:
     data = json.loads(sys.argv[1])
+    print("OK")
 except:
     print "ERROR"
     sys.exit(1)

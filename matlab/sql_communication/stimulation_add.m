@@ -4,7 +4,7 @@ function [ret] = stimulation_add(session_id, stimulation_duration, stimulation_a
     [ret,stimulation_data]=create_struct(session_id, stimulation_duration, stimulation_amplitude, stimulation_frequency);
     request.action = constant_activity.STIMULATION_ADD_ACTIVITY;
     request.data = stimulation_data;
-    request.table = constant_table.EEG_ACTIVITY;
+    request.table = constant_table.STIMULATION;
     if ret ~= 0
         return;
     end

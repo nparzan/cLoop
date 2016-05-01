@@ -19,15 +19,15 @@ function sql_add_data_from_matlab($data,$table,$action,$conn){
 
     // If query was successful, get id of new session
     if ($conn->query($sql) === TRUE) {
-
+        $last_id = $conn->insert_id;
         // When creating a new session we return the new session_id
         if ($action == "SESSION_ADD"){
-            $last_id = $conn->insert_id;
             $ret_arr["session_id"] = $last_id;
         }
         // Otherwise, we return the current session_id
         else{
             $ret_arr["session_id"] = $data["session_id"];   
+            $ret_arr["entry_id"] = $last_id;
         }
         
         $ret_arr["ret"] = 0;
