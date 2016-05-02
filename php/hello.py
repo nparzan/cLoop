@@ -1,6 +1,9 @@
 import sys
 import json
+import requests
 
+#{action:'EEG_ACTIVITY_AND_STIMULATION_GET',data:{session_id:7}}
+j = json.dumps({'action':'EEG_ACTIVITY_AND_STIMULATION_GET','data':{'session_id':7}}, sort_keys=True, indent=4, separators=(',', ': '))
 
 def main():
     print 'About to try'

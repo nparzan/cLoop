@@ -23,5 +23,52 @@ High: <input type="number" name="HighID"><br>
 <input type="submit">
 </form>
 "HELLO123456"
+<?php
+    $obj =   "{\"activity\": \"EEG_ACTIVITY_AND_STIMULATION_GET\",\"data\": { \"session_id\": \"7\"  } }";
+
+?>
+<form action="sql_server/handle_request_from_matlab.php" method="post">
+Data: <input type="text" name="name"><br>
+<input type="submit">
+
+<button type="button" onclick="post()">Try it</button>
+
+<script>
+function reqListener () {
+    var oReq = new XMLHttpRequest();
+    oReq.addEventListener("load", reqListener);
+    var obj = JSON.stringify({"activity":"EEG_ACTIVITY_AND_STIMULATION_GET","data":{"session_id":7}});
+    oReq.submittedData = obj;
+    oReq.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+    oReq.open("POST", "sql_server/handle_request_from_matlab.php");
+    oReq.send();
+    console.log("HI");
+    console.log(this.responseText);
+}
+
+function post(){
+    var obj = {action:"EEG_ACTIVITY_AND_STIMULATION_GET",data:{session_id:"7"}};
+    console.log(obj);
+    request= new XMLHttpRequest();
+    request.open("POST", "sql_server/handle_request_from_matlab.php",true);
+    request.setRequestHeader("Content-type", "application/json");
+    request.onreadystatechange = function () {
+    if (request.readyState == 4 && request.status == 200) {
+        console.log(request.responseText);
+    }
+}
+    request.send(JSON.stringify(obj));
+
+    //console.log(request.responseText);
+}
+
+
+
+</script>
+
+</form>
+
+
 </body>
+
 </html>
