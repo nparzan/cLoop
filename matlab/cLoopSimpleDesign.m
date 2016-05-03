@@ -120,7 +120,7 @@ end
 
 while (numOfStim < maxNumOfStim)
     
-    EEG = getEEG(LC.EEGLength,8,host);
+    EEG = getEEG(LV.EEGLength,8,host);
     
     % Prints of the current activity and delta, will be removed
     numOfStim = numOfStim+1;
