@@ -12,3 +12,6 @@ headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 r = requests.post(url, data=obj, headers=headers)
 
 print r.content
+j = json.dumps(r.content)
+print j
+print type(j)
