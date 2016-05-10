@@ -27,6 +27,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [ret, theta, delta] = cLoopSimpleDesign (templateName)
 
+addpath(genpath('MatNIC_v2.5'));
+
 %%%%%%%%%%%%%%%%%%%%%%%%%
 % Veriables Definitions %
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -44,8 +46,8 @@ tACS_Freq = 10000; % unused here for now, handeled in the tamplate
 restingPeriod = 10; % time between stimulation and the next EEG record 
 
 % Learned veriables - default values
-LV.stimLength = 10;
-LV.EEGLength = 10;
+LV.stimLength = 100;
+LV.EEGLength = 100;
 LV.stimAmp = 0;
 
 % the next vars are just for Tal. to be deleted later
@@ -59,8 +61,6 @@ delta = zeros(10,1);
 %%%%%%%%%%%%%%%%%
 % Function Body %
 %%%%%%%%%%%%%%%%%
-
-addpath('./MatNIC');
 
 % If nothing is entered then we load our basic empty template
 
