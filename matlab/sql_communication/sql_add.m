@@ -12,9 +12,9 @@ function [ret] = sql_add(varargin)
         request.action = constant_activity.SESSION_ADD_ACTIVITY;
         request.table = constant_table.SESSION;
     elseif strcmp(activity,constant_activity.EEG_ACTIVITY_ADD_ACTIVITY)
-        session_id = varargin{2}; stimulation_id = varargin{3}; 
-        alpha_activity = varargin{4}; beta_activity = varargin{5}; 
-        gamma_activity = varargin{6}; delta_activity = varargin{7}; theta_activity = varargin{8};
+        session_id = varargin{2}; stimulation_id = varargin{3};
+        delta_activity = varargin{4}; theta_activity = varargin{5};
+        alpha_activity = varargin{6}; beta_activity = varargin{7}; gamma_activity = varargin{8}; 
         [ret,data]=create_struct(session_id,stimulation_id, alpha_activity, beta_activity, gamma_activity, delta_activity, theta_activity);
         request.action = constant_activity.EEG_ACTIVITY_ADD_ACTIVITY;
         request.table = constant_table.EEG_ACTIVITY;
