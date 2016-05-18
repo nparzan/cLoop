@@ -36,18 +36,18 @@ addpath(genpath('MatNIC_v2.5'));
 ret = 0;
 isStimulating = false;
 initTime = 0;
-host = get_ip(); % we get the ip from the OS
 channelToStim = 1;
 transitionToPeak = 5000;
 transitionFromPeak = 5000;
+host = 'localhost';
 
 % Constants
 tACS_Freq = 10000; % unused here for now, handeled in the tamplate
 restingPeriod = 10; % time between stimulation and the next EEG record 
 
 % Learned veriables - default values
-LV.stimLength = 100;
-LV.EEGLength = 100;
+LV.stimLength = 1000; % Ms
+LV.EEGLength = 10; % seconds
 LV.stimAmp = 0;
 
 % the next vars are just for Tal. to be deleted later

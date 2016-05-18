@@ -14,7 +14,7 @@ eegChannel = 4;
 
 EEG.Activities(eegChannel,:)
 
-LV.stimLength = 10;
+LV.stimLength = 1000;
 LV.EEGLength = 10;
 LV.stimAmp = 0;
 
