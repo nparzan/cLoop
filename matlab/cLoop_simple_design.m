@@ -25,7 +25,7 @@
 %
 % Known issues: None
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [ret, theta, delta] = cLoopSimpleDesign (templateName)
+function [ret, theta, delta] = cLoop_simple_design (templateName)
 
 addpath(genpath('MatNIC_v2.5'));
 
@@ -120,7 +120,7 @@ end
 
 while (numOfStim < maxNumOfStim)
     
-    EEG = getEEG(LV.EEGLength,8,host);
+    EEG = get_eeg(LV.EEGLength,8,host);
     
     % Prints of the current activity and delta, will be removed
     numOfStim = numOfStim+1;
@@ -130,7 +130,7 @@ while (numOfStim < maxNumOfStim)
         delta(numOfStim)
     end
     
-    LV = getLearnedVarsFromServer(EEG);
+    LV = get_learned_vars_from_server(EEG);
     
     [ret, status] = MatNICQueryStatus(sock); 
     if (ret < 0)

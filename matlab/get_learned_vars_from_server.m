@@ -1,4 +1,4 @@
-function LV = getLearnedVarsFromServer(EEG)
+function LV = get_learned_vars_from_server(EEG)
 % This function will get EEG activity and return what stimulation
 % we would like to perform.
 % We assume that only channel 4 is relevant for our test.
