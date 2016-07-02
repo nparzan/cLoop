@@ -54,7 +54,7 @@
 % Created: 16 Jan 2013
 % Known issues: None
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [ret] = TestEEG (templateName, host)
+function [ret] = test_eeg (templateName, host)
 
 ret = 0;
 seconds=120;

@@ -25,7 +25,7 @@
 %
 % Known issues: None
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [ret, theta, delta] = cLoopSimpleDesign (templateName)
+function [ret, theta, delta] = cLoop_simple_design (templateName)
 
 addpath(genpath('MatNIC_v2.5'));
 
@@ -36,18 +36,18 @@ addpath(genpath('MatNIC_v2.5'));
 ret = 0;
 isStimulating = false;
 initTime = 0;
-host = get_ip(); % we get the ip from the OS
 channelToStim = 1;
 transitionToPeak = 5000;
 transitionFromPeak = 5000;
+host = 'localhost';
 
 % Constants
 tACS_Freq = 10000; % unused here for now, handeled in the tamplate
 restingPeriod = 10; % time between stimulation and the next EEG record 
 
 % Learned veriables - default values
-LV.stimLength = 100;
-LV.EEGLength = 100;
+LV.stimLength = 1000; % Ms
+LV.EEGLength = 10; % seconds
 LV.stimAmp = 0;
 
 % the next vars are just for Tal. to be deleted later
@@ -120,7 +120,7 @@ end
 
 while (numOfStim < maxNumOfStim)
     
-    EEG = getEEG(LV.EEGLength,8,host);
+    EEG = get_eeg(LV.EEGLength,8,host);
     
     % Prints of the current activity and delta, will be removed
     numOfStim = numOfStim+1;
@@ -130,7 +130,7 @@ while (numOfStim < maxNumOfStim)
         delta(numOfStim)
     end
     
-    LV = getLearnedVarsFromServer(EEG);
+    LV = get_learned_vars_from_server(EEG);
     
     [ret, status] = MatNICQueryStatus(sock); 
     if (ret < 0)
