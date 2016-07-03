@@ -5,6 +5,7 @@ require_once("log_event.php");
 require_once("sql_add_data_from_matlab.php");
 require_once("get_data_from_sql.php");
 require_once("../model_update.php");
+require_once("../model_get.php");
 require_once("../session_add.php");
 
 $ret = 0;
@@ -49,6 +50,10 @@ if ($data["action"] == "EEG_ACTIVITY_ADD" || $data["action"] == "SESSION_ADD" ||
 
 if ($data["action"] == "EEG_ACTIVITY_AND_STIMULATION_GET"){
     $response = get_eeg_activity_and_stimulation_from_sql($data,$conn);
+}
+
+if ($data["action"] == "REGRESSION_MODEL_GET"){
+    $response = model_get($data,$conn);
 }
 
 if ($data["action"] == "REGRESSION_MODEL_UPDATE"){
