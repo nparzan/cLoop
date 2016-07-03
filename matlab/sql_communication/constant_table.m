@@ -4,6 +4,7 @@ classdef constant_table
        LOG = 'CLOOP_LOG';
        EEG_ACTIVITY = 'CLOOP_EEG_ACTIVITY';
        STIMULATION = 'CLOOP_STIMULATION';
+       REGRESSION_MODEL = 'CLOOP_REGRESSION_MODEL';
     end    
 end
 

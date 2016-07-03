@@ -1,27 +1,37 @@
 import numpy as np
 from sklearn import linear_model
-
 import sys
 import json
 import requests
 
-#delta, theta, alpha, beta, gamma
-def get_deltas(act_a, act_b):
+#Get relevant input variables
+session_id = sys.argv[1]
+parameter_for_fitting = int(sys.argv[2])
+
+#Deduce the eeg difference between a pair of activities linked by a stimulation
+def get_deltas(act_a, act_b):    
     bands = ["delta_activity", "theta_activity", "alpha_activity", "beta_activity", "gamma_activity"]
     deltas = list()
     for band in bands:
-        #print "subtracting", float(act_a[band]), "and", float(act_b[band])
         deltas.append(float(act_a[band]) - float(act_b[band]))
     return deltas
+
+#Once model has been fit, get coefficents and intercept value
+def get_regression_model_coeffs(model):
+    bands = ["delta", "theta", "alpha", "beta", "gamma"]
+    coeffs = dict()
+    for i in range(len(model.coef_)):
+        coeffs[bands[i]] = model.coef_[i]
+    coeffs["intercept"] = model.intercept_
+    return coeffs
 
 #{action:'EEG_ACTIVITY_AND_STIMULATION_GET',data:{session_id:7}} stimulation_duration, stimulation_amplitude, stimulation_frequency
 request_from_server = dict()
 request_from_server['action'] = 'EEG_ACTIVITY_AND_STIMULATION_GET'
 request_from_server['data'] = dict()
 #FIXME - change to input session id
-request_from_server['data']['session_id'] = 8
+request_from_server['data']['session_id'] = session_id
 
-#obj = json.dumps({'action':'EEG_ACTIVITY_AND_STIMULATION_GET','data':{'session_id':6}})#, sort_keys=True, indent=4, separators=(',', ': '))
 obj = json.dumps(request_from_server)
 url = 'http://www.cs.tau.ac.il/~noamp1/cLoop/php/sql_server/handle_request_from_matlab.php'
 
@@ -50,6 +60,7 @@ for eeg_activity in r.json()["data"]["EEG_ACTIVITY"]:
 deltas = list()
 stims = list()
 
+#FIXME: Document
 for stimulation in stimulations_by_stimulation_id:
     if (not stimulations_by_stimulation_id[stimulation]["eeg_activity_id"] is None) and \
         (int(stimulations_by_stimulation_id[stimulation]["eeg_activity_id"]) in eeg_activities_by_eeg_activity_id) and \
@@ -61,29 +72,24 @@ for stimulation in stimulations_by_stimulation_id:
             stim = stimulations_by_stimulation_id[stimulation]
             stims.append([float(stim["stimulation_duration"]), float(stim["stimulation_amplitude"]), float(stim["stimulation_frequency"])])
 
-    #(not eeg_activities[int(stimulation["eeg_activity_id"])]["stimulation_id"] is None)
-
-print (stims)
-print (deltas)
-
-
 X = np.ndarray(shape = (len(deltas),len(deltas[0])), buffer = np.array(deltas), dtype = float)
-y_0 = np.ndarray(shape = (len(stims)), buffer = np.array([item[0] for item in stims]), dtype = float)
-y_1 = np.ndarray(shape = (len(stims)), buffer = np.array([item[0] for item in stims]), dtype = float)
-y_2 = np.ndarray(shape = (len(stims)), buffer = np.array([item[0] for item in stims]), dtype = float)
-temp = [1,2,3,4,5]
-X_test = np.array(temp).reshape(1,-1)
+y_0 = np.ndarray(shape = (len(stims)), buffer = np.array([item[parameter_for_fitting] for item in stims]), dtype = float)
+#y_1 = np.ndarray(shape = (len(stims)), buffer = np.array([item[0] for item in stims]), dtype = float)
+#y_2 = np.ndarray(shape = (len(stims)), buffer = np.array([item[0] for item in stims]), dtype = float)
+#temp = [1,2,3,4,5]
+#X_test = np.array(temp).reshape(1,-1)
 
-#X_test = np.ndarray(shape = (5), buffer = np.array([1,2,3,4,5]), dtype = float)
-#X_test.reshape(1,-1)
 regr = linear_model.LinearRegression()
-
 regr.fit(X, y_0)
 
-print("Done with regression fit")
-print("Predicting for", X_test)
-print("Reg predict", regr.predict(X_test))
-print('Coefficients: \n', regr.coef_)
-print("Intercept: \n", regr.intercept_)
-print("done")
+#print (stims)
+#print (deltas)
+#print("Done with regression fit")
+#print("Predicting for", X_test)
+#print("Reg predict", regr.predict(X_test))
+#print('Coefficients: \n', regr.coef_)
+#print("Intercept: \n", regr.intercept_)
+#print("done")
+
+print json.dumps(get_regression_model_coeffs(regr), sort_keys=True)
 
