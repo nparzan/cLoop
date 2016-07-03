@@ -71,12 +71,19 @@ X = np.ndarray(shape = (len(deltas),len(deltas[0])), buffer = np.array(deltas), 
 y_0 = np.ndarray(shape = (len(stims)), buffer = np.array([item[0] for item in stims]), dtype = float)
 y_1 = np.ndarray(shape = (len(stims)), buffer = np.array([item[0] for item in stims]), dtype = float)
 y_2 = np.ndarray(shape = (len(stims)), buffer = np.array([item[0] for item in stims]), dtype = float)
-X_test = np.ndarray(shape = (5), buffer = np.array([1,2,3,4,5]), dtype = float)
+temp = [1,2,3,4,5]
+X_test = np.array(temp).reshape(1,-1)
+
+#X_test = np.ndarray(shape = (5), buffer = np.array([1,2,3,4,5]), dtype = float)
+#X_test.reshape(1,-1)
 regr = linear_model.LinearRegression()
 
 regr.fit(X, y_0)
 
 print("Done with regression fit")
+print("Predicting for", X_test)
+print("Reg predict", regr.predict(X_test))
 print('Coefficients: \n', regr.coef_)
+print("Intercept: \n", regr.intercept_)
 print("done")
 
