@@ -3,7 +3,7 @@ function [ Delta,Theta,Alpha,Beta,Gamma ] = analyze_eeg( eeg_signal )
 % use FFT to break it into to frequencies and return the MAX AMPLITUDE
 % for each of the wave types
 
-threshold = 0.5; % threshold for eeg activity
+threshold = 0.01; % threshold for eeg activity
 
 fs = 500; % StarSim Sampling Frequency is 500Hz
                        
@@ -61,10 +61,15 @@ end
 
 % Calculating the max Amplitude for each wave type
 
-Delta = max(Delta.*(Delta < threshold));
-Theta = max(Theta.*(Theta < threshold));
-Alpha = max(Alpha.*(Alpha < threshold));
-Beta = max(Beta.*(Beta < threshold));
-Gamma = max(Gamma.*(Gamma < threshold));
+%Delta = max(Delta.*(Delta < threshold));
+%Theta = max(Theta.*(Theta < threshold));
+%Alpha = max(Alpha.*(Alpha < threshold));
+%Beta = max(Beta.*(Beta < threshold));
+%Gamma = max(Gamma.*(Gamma < threshold));
+Delta = max(Delta);
+Theta = max(Theta);
+Alpha = max(Alpha);
+Beta = max(Beta);
+Gamma = max(Gamma);
 end
 

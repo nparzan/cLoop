@@ -28,19 +28,21 @@
 function [ret, s] = cLoop_run_session (templateName)
 try
     addpath(genpath('MatNIC_v2.5'));
-    
+    addpath(genpath('tools'));
+    addpath(genpath('sql_communication'));
     print_constants;
-    
+    constant_load_all;
     ret = 0;
+    
+    % If nothing is entered then we load our basic empty template
+    
+    if ~exist('templateName','var') || isempty(templateName)
+        templateName = 'FC6_exp';
+    end
     
     s = cLoop_session(templateName);
     clean_up = onCleanup(@() terminate_session(s));
     
-    % If nothing is entered then we load our basic empty template
-    
-    if ~exist('templateName','var') || isempty(s.TEMPLATE_NAME)
-        s.TEMPLATE_NAME = 'FC6_exp';
-    end
     % Connect to NIC Software
     
     [ret, ~ , s.SOCK] = MatNICConnect(s.HOST);
@@ -115,7 +117,7 @@ try
                 
             case 'CODE_STATUS_STIMULATION_FULL'
                 
-                log_print(sprintf('* Stimulation started. Ellapsed %f sec', etime(clock, s.INIT_TIME) ),s.DEF_PRINT)
+                log_print(sprintf('* Stimulation started. Ellapsed %f sec', etime(clock, s.INIT_TIME) ),s.DEF_PRINT);
                 
                 ret = MatNICOnlineAtacsChange(s.STIM_AMP, s.CHANNEL_TO_STIM, ...
                     s.TRANSITION_TO_PEAK, s.SOCK);
@@ -123,7 +125,9 @@ try
                     break
                 end
                 % Wait for the stimulation to finish
-                pause((s.START_STIM_LENGTH + s.TRANSITION_TO_PEAK)/60);
+                disp('wait for start stimulation to end')
+                pause((s.START_STIM_LENGTH + s.TRANSITION_TO_PEAK)/1000);
+                disp('start stimulation ended')
                 % Turn off stimulation
                 ret = MatNICOnlineAtacsChange(s.MIN_AMP, s.CHANNEL_TO_STIM, ...
                     s.TRANSITION_FROM_PEAK, s.SOCK);
@@ -131,7 +135,7 @@ try
                     break
                 end
                 % Wait for the transition to finish
-                pause(s.TRANSITION_FROM_PEAK/60);
+                pause(s.TRANSITION_FROM_PEAK/1000);
                 break
                 
             case 'CODE_STATUS_STIMULATION_RAMPDOWN'
@@ -165,39 +169,52 @@ try
     s.CURR_EEG = get_eeg(s.OPT_EEG_LENGTH, s.EEG_CHANNELS, s.HOST);
     
     s.OPTIMAL_ACTIVITY = get_optimal_activity(s.CURR_EEG);
-    
+    s.CURR_EEG = s.OPTIMAL_ACTIVITY;
+    s.OPTIMAL_ACTIVITY
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % adding the new session to the server
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
+    disp('adding session')
     ret = init_session(s);
     
     if (ret < 0)
         log_print('ERROR:  init session failed',s.DEF_PRINT)
         return
     end
+    disp('session added')
     
+    disp('adding regression model')
+    add_regression_model(s)
+    
+    if (ret < 0)
+        log_print('ERROR: model adding failed',s.DEF_PRINT)
+        return
+    end
+    disp('regression model added')
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Main loop, reading eeg, analyzing and stimulating.
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    finalTime = datenum(clock() + LOOP_LENGTH);
+    finalTime = datenum(clock() + s.LOOP_LENGTH);
     
     while datenum(clock()) < finalTime
         
-        s.CURR_EEG = get_eeg(s.LOOP_EEG_LENGTH, s.EEG_CHANNELS, s.HOST);
-        
-        ret = get_model_from_server(s);
-        
+        disp('getting eeg')
+        s.CURR_EEG = get_optimal_activity(get_eeg(s.LOOP_EEG_LENGTH, s.EEG_CHANNELS, s.HOST));
+        s.CURR_EEG
+        disp('sending eeg')
+        ret = send_eeg(s);
+        disp('eeg sent')
         if (ret < 0)
-            log_print(sprintf('Obtaining model failed with rc %d',ret), print_constants.CONSOLE)
+            log_print(sprintf('sending eeg to server failed with rc %d',ret), print_constants.CONSOLE)
             return
         end
         
-        ret = update_model_in_server(s);
-        
+        disp('geting model')
+        ret = get_model_from_server(s);
+        disp('model obtained')
         if (ret < 0)
-            log_print(sprintf('Updating model failed with rc %d',ret), print_constants.CONSOLE)
+            log_print(sprintf('Obtaining model failed with rc %d',ret), print_constants.CONSOLE)
             return
         end
         
@@ -206,7 +223,7 @@ try
             log_print(sprintf('MatNICQueryStatus failed with rc %d',ret), print_constants.CONSOLE)
             return
         end
-        
+        status
         switch status
             % Stimulation in progress
             case 'CODE_STATUS_STIMULATION_RAMPUP'
@@ -226,8 +243,25 @@ try
                 if (ret < 0)
                     break
                 end
+                % send stimulation to server
+                disp('sending stimulation')
+                ret = send_stim(s);
+                disp('stimulation sent')
+                if (ret < 0)
+                    log_print(sprintf('sending eeg to server failed with rc %d',ret), print_constants.CONSOLE)
+                    return
+                end
+                %update the model
+                disp('updating model')
+                ret = update_model_in_server(s);
+                disp('model updated')
+                if (ret < 0)
+                    log_print(sprintf('Updating model failed with rc %d',ret), print_constants.CONSOLE)
+                    return
+                end
                 % Wait for the stimulation to finish
-                pause((s.STIM_LENGTH + s.TRANSITION_TO_PEAK)/60);
+                disp('wait for stimulation to finish')
+                pause((s.STIM_LENGTH + s.TRANSITION_TO_PEAK)/1000);
                 % Turn off stimulation
                 ret = MatNICOnlineAtacsChange(s.MIN_AMP, s.CHANNEL_TO_STIM, ...
                     s.TRANSITION_FROM_PEAK, s.SOCK);
@@ -235,10 +269,11 @@ try
                     break
                 end
                 % Wait for the transition to finish
-                pause(s.TRANSITION_FROM_PEAK/60);
+                pause(s.TRANSITION_FROM_PEAK/1000);
                 % Wait resting period before next eeg session
+                disp('resting...')
                 pause(s.RESTING_PERIOD);
-                break
+                continue
                 
                 
             case 'CODE_STATUS_STIMULATION_RAMPDOWN'
@@ -269,6 +304,8 @@ try
     % Final eeg recording - Post Trail
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
+    disp('session done, getting final eeg...')
+    
     s.END_EEG = get_eeg(s.FINAL_EEG_LENGTH, s.EEG_CHANNELS, s.HOST);
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -278,7 +315,7 @@ try
     abort_rt = MatNICAbortStimulation(s.SOCK);
     
     if (abort_rt < 0)
-        log_print('Abort stimulation failed',s.DEF_PRINT)
+        log_print('Abort stimulation failed',s.DEF_PRINT);
     end
     
     s.ABORTED = true;

@@ -5,10 +5,10 @@ function [ average_eeg ] = get_optimal_activity( EEG )
 % for now, it is just the average of the channel activity after the initial
 % stimulation.
 
-average_eeg = zeros(1,EEG.Channels);
+average_eeg = zeros(1,5);
 
 for band = 1:5
-   average_eeg = average(EEG.Activities(:,band)); 
+   average_eeg(1,band) = mean(EEG.Activities(:,band)); 
 end
 
 end
