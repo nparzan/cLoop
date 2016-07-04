@@ -65,6 +65,7 @@ function single_query($conn,$sql,$sess,$type){
         }
         $q_res->free();
         $ret_arr["data"]["$type"] = $rows;
+        $ret_arr["ret"] = 0;
     // Query unsuccessful, return error details
     } else {
         $err = "Query: " . $sql . "\n Returned Error: " . $conn->error;

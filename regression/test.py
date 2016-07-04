@@ -72,6 +72,11 @@ for stimulation in stimulations_by_stimulation_id:
             stim = stimulations_by_stimulation_id[stimulation]
             stims.append([float(stim["stimulation_duration"]), float(stim["stimulation_amplitude"]), float(stim["stimulation_frequency"])])
 
+#If we don't have enough points, we abort
+if len(deltas) < 2:
+    print 'NONE'
+    exit(0);
+
 X = np.ndarray(shape = (len(deltas),len(deltas[0])), buffer = np.array(deltas), dtype = float)
 y_0 = np.ndarray(shape = (len(stims)), buffer = np.array([item[parameter_for_fitting] for item in stims]), dtype = float)
 #y_1 = np.ndarray(shape = (len(stims)), buffer = np.array([item[0] for item in stims]), dtype = float)
