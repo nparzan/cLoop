@@ -1,2 +1,3 @@
 matlab/MatNIC
+matlab/credentials.m
 php/sql_server/connect_tokens.php

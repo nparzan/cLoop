@@ -69,6 +69,8 @@ classdef cLoop_session < handle
     methods
         
         function s = cLoop_session(templateName)
+            % Load constants
+            credentials;
             %
             % Create session object
             %
@@ -84,7 +86,7 @@ classdef cLoop_session < handle
             
             %s.TRANSITION_TO_PEAK = 5000; % mS
             %s.TRANSITION_FROM_PEAK = 5000; % mS
-             s.TRANSITION_TO_PEAK = 1000; % mS
+            s.TRANSITION_TO_PEAK = 1000; % mS
             s.TRANSITION_FROM_PEAK = 1000; % mS
             %s.START_EEG_LENGTH = 60*5; % seconds
             %s.START_STIM_LENGTH = 1000*60*10; % mS
@@ -135,10 +137,9 @@ classdef cLoop_session < handle
             s.task = 'some task';
             s.electrode_placement = get_electrode_placement(s.TEMPLATE_NAME);
             s.comment = '';
-            
             s.session_id = '';
-            s.user = '';
-            s.password = '';
+            s.user = credentials.USER;
+            s.password = credentials.PASS;
             
             s.stimulation_id = -1;
             s.activity_id = 0;
@@ -147,18 +148,17 @@ classdef cLoop_session < handle
         
         function rc = init_session(s)
             % adding the new session to the server
-            try
-                for t = 1:5
-                    
+            for t = 1:5
+                try
                     ret = sql_add(constant_activity.SESSION_ADD_ACTIVITY, ...
-                                  s.subject_id,...
-                                  s.experimenter_id,...
-                                  s.task, ...
-                                  s.OPTIMAL_ACTIVITY(1),s.OPTIMAL_ACTIVITY(2),s.OPTIMAL_ACTIVITY(3),...
-                                  s.OPTIMAL_ACTIVITY(4),s.OPTIMAL_ACTIVITY(5),...
-                                  s.electrode_placement,...
-                                  s.comment)
-                              
+                        s.subject_id,...
+                        s.experimenter_id,...
+                        s.task, ...
+                        s.OPTIMAL_ACTIVITY(1),s.OPTIMAL_ACTIVITY(2),s.OPTIMAL_ACTIVITY(3),...
+                        s.OPTIMAL_ACTIVITY(4),s.OPTIMAL_ACTIVITY(5),...
+                        s.electrode_placement,...
+                        s.comment)
+                    
                     rc = ret.ret;
                     if rc < 0
                         log_print(sprintf('adding session failed with rt %d',ret), s.DEF_PRINT)
@@ -167,21 +167,21 @@ classdef cLoop_session < handle
                         s.session_id = ret.session_id;
                         break
                     end
+                catch ME
+                    log_print(ME.getReport(), s.DEF_PRINT);
+                    rc = -1;
+                    continue
                 end
-            catch ME
-                log_print(ME.getReport(), s.DEF_PRINT);
-                rc = -1;
             end
         end
         
         function rc = add_regression_model(s)
             % adding the new session to the server
-            try
-                for t = 1:5
-                    
+            for t = 1:5
+                try
                     ret = sql_add(constant_activity.REGRESSION_MODEL_ADD_ACTIVITY, ...
-                                  s.session_id)
-                     
+                        s.session_id)
+                    
                     rc = ret.ret;
                     if rc < 0
                         log_print(sprintf('adding regression failed with rt %d',ret), s.DEF_PRINT)
@@ -190,27 +190,27 @@ classdef cLoop_session < handle
                         s.regression_id = ret.entry_id;
                         break
                     end
+                catch ME
+                    log_print(ME.getReport(), s.DEF_PRINT);
+                    rc = -1;
+                    continue
                 end
-            catch ME
-                log_print(ME.getReport(), s.DEF_PRINT);
-                rc = -1;
             end
         end
         
         function rc = send_eeg(s)
             % adding the new session to the server
-            try
-                for t = 1:5
-                    
+            for t = 1:5
+                try
                     ret = sql_add(constant_activity.EEG_ACTIVITY_ADD_ACTIVITY, ...
-                                  s.session_id,...
-                                  s.stimulation_id,...
-                                  s.CURR_EEG(1),...
-                                  s.CURR_EEG(2),...
-                                  s.CURR_EEG(3),...
-                                  s.CURR_EEG(4),...
-                                  s.CURR_EEG(5))
-                              
+                        s.session_id,...
+                        s.stimulation_id,...
+                        s.CURR_EEG(1),...
+                        s.CURR_EEG(2),...
+                        s.CURR_EEG(3),...
+                        s.CURR_EEG(4),...
+                        s.CURR_EEG(5))
+                    
                     rc = ret.ret;
                     if rc < 0
                         log_print(sprintf('adding eeg activity failed with rt %d',ret), s.DEF_PRINT)
@@ -219,25 +219,25 @@ classdef cLoop_session < handle
                         s.activity_id = ret.entry_id;
                         break
                     end
+                catch ME
+                    log_print(ME.getReport(), s.DEF_PRINT);
+                    rc = -1;
+                    continue
                 end
-            catch ME
-                log_print(ME.getReport(), s.DEF_PRINT);
-                rc = -1;
             end
         end
         
         function rc = send_stim(s)
             % adding the new session to the server
-            try
-                for t = 1:5
-                    
+            for t = 1:5
+                try
                     ret = sql_add(constant_activity.STIMULATION_ADD_ACTIVITY, ...
-                                  s.session_id,...
-                                  s.activity_id,...
-                                  s.STIM_LENGTH/1000,...
-                                  s.STIM_AMP,...
-                                  s.TACS_FREQ)
-                              
+                        s.session_id,...
+                        s.activity_id,...
+                        s.STIM_LENGTH/1000,...
+                        s.STIM_AMP,...
+                        s.TACS_FREQ)
+                    
                     rc = ret.ret;
                     if rc < 0
                         log_print(sprintf('adding stimulation failed with rt %d',ret), s.DEF_PRINT)
@@ -246,25 +246,25 @@ classdef cLoop_session < handle
                         s.stimulation_id = ret.entry_id;
                         break
                     end
+                catch ME
+                    log_print(ME.getReport(), s.DEF_PRINT);
+                    rc = -1;
+                    continue
                 end
-            catch ME
-                log_print(ME.getReport(), s.DEF_PRINT);
-                rc = -1;
             end
         end
         
         function rc = update_model_in_server(s)
             % send the activity to the server for regression
-            try
-                for t = 1:5
-                    
+            for t = 1:5
+                try
                     ret = regression_model_update(constant_activity.REGRESSION_MODEL_UPDATE_ACTIVITY,...
-                                                  s.session_id,...
-                                                  s.user,...
-                                                  s.password,...
-                                                  s.duration_model_update,...
-                                                  s.amplitude_model_update,...
-                                                  s.frequency_model_update)
+                        s.session_id,...
+                        s.user,...
+                        s.password,...
+                        s.duration_model_update,...
+                        s.amplitude_model_update,...
+                        s.frequency_model_update)
                     
                     rc = ret.ret;
                     if rc < 0
@@ -273,64 +273,64 @@ classdef cLoop_session < handle
                     else
                         break
                     end
+                catch ME
+                    log_print(ME.getReport(), s.DEF_PRINT)
+                    rc = -1;
+                    continue
                 end
-                
-            catch ME
-                log_print(ME.getReport(), s.DEF_PRINT)
-                rc = -1;
             end
         end
         
         
         function rc = get_model_from_server(s)
             % get the next stimulation from the server
-            try
-                for t = 1:5
-                    
+            for t = 1:5
+                try
                     ret = regression_model_get(constant_activity.REGRESSION_MODEL_GET_ACTIVITY,...
-                                               s.session_id,...
-                                               'AMPLITUDE_MODEL')
+                        s.session_id,...
+                        'AMPLITUDE_MODEL')
                     
                     rc = ret.ret;
                     if rc < 0
                         log_print(sprintf('fetching model from server failed with rt %d',ret), s.DEF_PRINT)
                         continue
+                    end
+                    ret.data.REGRESSION_MODEL
+                    ret.data.REGRESSION_MODEL.amplitude_model
+                    if strncmp(ret.data.REGRESSION_MODEL.amplitude_model,'NONE',4)
+                        disp('model not ready, sending random stimulatio');
+                        s.STIM_AMP = rand(1)
+                        break
                     else
+                        % Might need to convet to double!
+                        model = loadjson(ret.data.REGRESSION_MODEL.amplitude_model)
+                        coefs = zeros(1,6);
+                        coefs(3) = model.alpha;
+                        coefs(4) = model.beta;
+                        coefs(5) = model.gamma;
+                        coefs(1) = model.delta;
+                        coefs(2) = model.theta;
+                        coefs(6) = model.intercept;
+                        delta = s.OPTIMAL_ACTIVITY - s.CURR_EEG;
+                        s.STIM_AMP = [delta 1]*coefs';
+                        fprintf('stimulation from model is %d',s.STIM_AMP);
+                        if (s.STIM_AMP) < s.MIN_AMP
+                            s.STIM_AMP = s.MIN_AMP;
+                        elseif (s.STIM_AMP) > s.MAX_AMP
+                            s.STIM_AMP = s.MAX_AMP;
+                        end
                         break
                     end
+                catch ME
+                    log_print(ME.getReport(), s.DEF_PRINT)
+                    rc = -1;
+                    continue
                 end
-                ret.data.REGRESSION_MODEL
-                ret.data.REGRESSION_MODEL.amplitude_model
-                if strncmp(ret.data.REGRESSION_MODEL.amplitude_model,'NONE',4)
-                    disp('model not ready, sending random stimulatio');
-                    s.STIM_AMP = rand(1)
-                else
-                    % Might need to convet to double!
-                    model = loadjson(ret.data.REGRESSION_MODEL.amplitude_model)
-                    coefs = zeros(1,6);
-                    coefs(3) = model.alpha;
-                    coefs(4) = model.beta;
-                    coefs(5) = model.gamma;
-                    coefs(1) = model.delta;
-                    coefs(2) = model.theta;
-                    coefs(6) = model.intercept;
-                    s.STIM_AMP = [s.CURR_EEG 1]*coefs';
-                    fprintf('stimulation from model is %d',s.STIM_AMP);
-                    if (s.STIM_AMP) < s.MIN_AMP
-                        s.STIM_AMP = s.MIN_AMP;
-                    elseif (s.STIM_AMP) > s.MAX_AMP
-                        s.STIM_AMP = s.MAX_AMP;   
-                    end
-                end
-            catch ME
-                log_print(ME.getReport(), s.DEF_PRINT)
-                rc = -1;
             end
         end
         
         function terminate_session(s)
             ret_string = 'successfully';
-            
             if ~s.ABORTED
                 abort_rt = MatNICAbortStimulation(s.SOCK);
                 ret_string = 'unsuccessfully';
@@ -339,12 +339,8 @@ classdef cLoop_session < handle
                 end
                 s.ABORTED = true;
             end
-            
             log_print(sprintf('Session finished %s',ret_string),s.DEF_PRINT)
-            
         end
-        
-        
     end
     
 end

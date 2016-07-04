@@ -234,7 +234,7 @@ try
                 
                 log_print(sprintf('* Stimulation started. Ellapsed %f sec', etime(clock, s.INIT_TIME) ),s.DEF_PRINT)
                 
-                if ( s.STIM_AMP <= 0)
+                if ( s.STIM_AMP < 0)
                     continue
                 end
                 
