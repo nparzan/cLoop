@@ -4,8 +4,8 @@ require_once("connect.php");
 require_once("log_event.php");
 require_once("sql_add_data_from_matlab.php");
 require_once("get_data_from_sql.php");
-require_once("../model_update.php");
-require_once("../model_get.php");
+require_once("../regression_model/model_update.php");
+require_once("../regression_model/model_get.php");
 require_once("../session_add.php");
 
 $ret = 0;

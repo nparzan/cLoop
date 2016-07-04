@@ -1,6 +1,6 @@
 <?php
 function model_get($data,$conn){
-    require_once("sql_server/get_data_from_sql.php");
+    require_once("../sql_server/get_data_from_sql.php");
     // Init return value
     $ret_arr = array();
     $ret_arr["ret"] = 0;
