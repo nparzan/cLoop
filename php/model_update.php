@@ -16,7 +16,6 @@ function model_update($data,$conn){
         $parameter_for_fitting = 1;
     }
 
-
     // Connect to python station
     $ssh = new Net_SSH2('fermat-10.cs.tau.ac.il');
     if (!$ssh->login($user, $pass)) {
@@ -29,7 +28,7 @@ function model_update($data,$conn){
     $slashed_result = addslashes($result);
 
     // FIXME: Currently only updating model for amplitude
-    $sql = "INSERT into cloop_regression_model (session_id, amplitude_model) VALUES ($session_id, \"$slashed_result\")";
+    $sql = "UPDATE cloop_regression_model SET amplitude_model = \"$slashed_result\" WHERE session_id = $session_id";
     $err = "";
     if ($conn->query($sql) === TRUE){
         $last_id = $conn->insert_id;

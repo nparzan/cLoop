@@ -44,7 +44,7 @@ if ($call_conn["ret"] != 0){
 $session_id = $data["data"]["session_id"];
 
 // Add data to sql server
-if ($data["action"] == "EEG_ACTIVITY_ADD" || $data["action"] == "SESSION_ADD" || $data["action"] == "STIMULATION_ADD"){
+if ($data["action"] == "EEG_ACTIVITY_ADD" || $data["action"] == "SESSION_ADD" || $data["action"] == "STIMULATION_ADD" || $data["action"] == "REGRESSION_MODEL_ADD"){
     $response = sql_add_data_from_matlab($data["data"],$data["table"],$data["action"],$conn);
 }
 

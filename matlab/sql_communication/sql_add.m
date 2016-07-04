@@ -11,6 +11,11 @@ function [ret] = sql_add(varargin)
         [ret,data]=create_struct(subject_id,experimenter_id,task,objective_delta_value,objective_theta_value,objective_alpha_value,objective_beta_value,objective_gamma_value,electrode_placement,comment);
         request.action = constant_activity.SESSION_ADD_ACTIVITY;
         request.table = constant_table.SESSION;
+    elseif strcmp(activity,constant_activity.REGRESSION_MODEL_ADD_ACTIVITY)
+        session_id = varargin{2};
+        [ret,data]=create_struct(session_id);
+        request.action = constant_activity.REGRESSION_MODEL_ADD_ACTIVITY;
+        request.table = constant_table.REGRESSION_MODEL;
     elseif strcmp(activity,constant_activity.EEG_ACTIVITY_ADD_ACTIVITY)
         session_id = varargin{2}; stimulation_id = varargin{3};
         delta_activity = varargin{4}; theta_activity = varargin{5};
